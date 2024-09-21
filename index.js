@@ -1,0 +1,122 @@
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+const bodyParser = require('body-parser');
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+const API_URL = "https://phi.us.gaianet.network/v1/chat/completions";
+
+// Questions to ask the user
+const tripQuestions = [
+  "What is your destination?",
+  "What type of vacation are you looking for?",
+  "What kind of weather do you prefer?",
+  "How many days are you planning for?",
+  "What is your budget?",
+  "Can you describe your ideal vacation in a few words?",
+  "What is your preferred mode of travel to the destination?",
+  "How do you plan to get around the destination?",
+  "How many people are traveling?",
+  "What type of accommodation do you prefer?",
+  "Any special interests or activities you want to focus on?",
+  "Any dietary preferences or restrictions?"
+];
+
+const responseKeys = [
+  'destinationAnswer',
+  'vacationTypeAnswer',
+  'weatherAnswer',
+  'daysAnswer',
+  'budgetAnswer',
+  'idealVacationAnswer',
+  'travelModeAnswer',
+  'localTravelAnswer',
+  'numberOfPeopleAnswer',
+  'accomodationAnswer',
+  'interestAnswer',
+  'dietAnswer'
+];
+
+let userResponses = {};
+let currentQuestionIndex = 0;
+
+app.post('/chat', async (req, res) => {
+  const userMessage = req.body.message;
+
+  if (!userMessage && currentQuestionIndex === 0) {
+    return res.json({ message: tripQuestions[currentQuestionIndex] });
+  }
+
+  if (!userMessage) {
+    return res.status(400).json({ error: "Message is required" });
+  }
+
+  if (currentQuestionIndex < tripQuestions.length) {
+    userResponses[responseKeys[currentQuestionIndex]] = userMessage;
+    currentQuestionIndex++;
+    if (currentQuestionIndex < tripQuestions.length) {
+      return res.json({ message: tripQuestions[currentQuestionIndex] });
+    } else {
+      const compiledInfo = `
+You are a trip planning expert which prepares a day-to-day itinerary of the trip for the user. Your answering format should follow this template:
+Date: "Provide the date"
+Hotel Recommendation: "Provide hotel recommendation"
+Morning:
+  Time: "Provide time" | Activity: "Provide activity"
+Afternoon:
+  Time: "Provide time" | Activity: "Provide activity"
+Evening:
+  Time: "Provide time" | Activity: "Provide activity"
+
+A person wants to go to "${userResponses.destinationAnswer}" and have a "${userResponses.vacationTypeAnswer}" type of vacation. Plan the trip when the weather is "${userResponses.weatherAnswer}" and make it "${userResponses.daysAnswer}" days long. The budget is "${userResponses.budgetAnswer}" INR. This person is looking for an experience like this: "${userResponses.idealVacationAnswer}". The preferred mode of travel to the destination is "${userResponses.travelModeAnswer}" and preferred mode of local travel to go around the destination is "${userResponses.localTravelAnswer}". "${userResponses.numberOfPeopleAnswer}" people are going on the trip. 
+
+Give recommendations for "${userResponses.accomodationAnswer}" type of accommodation at the destination. Include "${userResponses.interestAnswer}" in the day-to-day trip plan. The places to eat should follow their preferences: "${userResponses.dietAnswer}".
+      `;
+      try {
+        const response = await axios.post(
+          API_URL,
+          {
+            messages: [
+              { role: "system", content: "You are a helpful assistant." },
+              { role: "user", content: compiledInfo }
+            ]
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            }
+          }
+        );
+
+        let aiResponse = response.data.choices[0].message.content.trim();
+
+        aiResponse = aiResponse
+          .replace(/Date/g, "\nDate")
+          .replace(/Hotel Recommendation/g, "\nHotel Recommendation")
+          .replace(/Morning/g, "\nMorning")
+          .replace(/Afternoon/g, "\nAfternoon")
+          .replace(/Evening/g, "\nEvening");
+
+        res.json({ message: aiResponse });
+      } catch (error) {
+        console.error("Error communicating with the Gaia API:", error.response?.data || error.message);
+        res.status(500).json({ error: "Error communicating with the Gaia API" });
+      }
+      currentQuestionIndex = 0;
+      userResponses = {};
+    }
+  }
+});
+
+app.get('/', (req, res) => {
+  res.send("Server is running");
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

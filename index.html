@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Chatbot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #000000;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .chat-container {
+        width: 90vw;
+        height: 90vh;
+        background-color: #0a0a0a;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0px 5px 25px rgba(0, 255, 255, 0.6);
+        max-width: 700px;
+        max-height: 90vh;
+        overflow: hidden;
+        margin: 20px;
+        animation: scaleIn 0.6s ease-out;
+    }
+
+    .chat-header {
+        background-color: #0d0d0d;
+        color: #00ccff;
+        padding: 20px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 0 20px rgba(0, 204, 255, 0.8);
+        animation: glow 1.5s infinite alternate;
+    }
+
+    .chat-body {
+        padding: 20px;
+        flex-grow: 1;
+        overflow-y: auto;
+        background-color: #0d0d0d;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .message {
+        margin-bottom: 15px;
+        padding: 10px 15px;
+        border-radius: 20px;
+        max-width: 90%;
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    .user {
+        background-color: #00ccff;
+        color: #ffffff;
+        align-self: flex-end;
+        box-shadow: 0px 0px 15px rgba(0, 204, 255, 0.7);
+    }
+
+    .bot {
+        background-color: #333333;
+        color: #ffffff;
+        align-self: flex-start;
+        box-shadow: 0px 0px 10px rgba(75, 79, 86, 0.7);
+    }
+
+    .chat-footer {
+        display: flex;
+        padding: 15px;
+        border-top: 1px solid #ddd;
+        background-color: #0d0d0d;
+        box-shadow: 0 -2px 10px rgba(0, 204, 255, 0.6);
+    }
+
+    .input-message {
+        flex-grow: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        background-color: #333333;
+        color: #ffffff;
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .send-btn {
+        background-color: #00ccff;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        margin-left: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        box-shadow: 0px 0px 15px rgba(0, 204, 255, 0.8);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .send-btn:hover {
+        background-color: #0088cc;
+        transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0.9);
+            opacity: 0.5;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes glow {
+        from {
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.8);
+        }
+        to {
+            box-shadow: 0 0 40px rgba(0, 204, 255, 1);
+        }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .chat-container {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .chat-header {
+            font-size: 20px;
+        }
+
+        .chat-body {
+            padding: 15px;
+        }
+
+        .input-message {
+            font-size: 14px;
+        }
+
+        .send-btn {
+            padding: 8px 12px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">
+    Plan your Trip!
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-footer">
+    <input type="text" id="messageInput" class="input-message" placeholder="Type your message">
+    <button class="send-btn" onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+    const chatBody = document.getElementById('chatBody');
+    const messageInput = document.getElementById('messageInput'); 
+    async function sendMessage() {
+    const userMessage = messageInput.value.trim();
+      if (userMessage === '') return;
+      appendMessage(userMessage, 'user');
+      const response = await fetch('http://localhost:3000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage })
+      });
+      const data = await response.json();
+      appendMessage(data.message, 'bot');
+      messageInput.value = '';
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+    function appendMessage(message, sender) {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message', sender);
+      messageElement.textContent = message;
+      chatBody.appendChild(messageElement);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+  
+    async function fetchFirstQuestion() {
+      try {
+        const response = await fetch('http://localhost:3000/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: '' }) 
+        });
+        const data = await response.json();
+        if (data && data.message) {
+          appendMessage(data.message, 'bot');
+        } else {
+          console.error('Error fetching the first question:', data);
+        }
+      } catch (error) {
+        console.error('Error fetching the first question:', error);
+      }
+    }
+  
+    fetchFirstQuestion();
+  
+    messageInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
+    </script>
+
+</body>
+</html>
