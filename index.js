@@ -104,15 +104,18 @@ Give recommendations for "${userResponses.accomodationAnswer}" type of accommoda
         // Ensure proper formatting of the final response
         let aiResponse = response.data.choices[0].message.content.trim();
 
-        // Format the response with new lines after key sections
-        aiResponse = aiResponse
-          .replace(/Date/g, "\nDate")
-          .replace(/Hotel Recommendation/g, "\nHotel Recommendation")
-          .replace(/Morning/g, "\nMorning")
-          .replace(/Afternoon/g, "\nAfternoon")
-          .replace(/Evening/g, "\nEvening");
-
-        res.json({ message: aiResponse });
+        // Replace '|' with '<br>' for line breaks
+        let formattedResponse = aiResponse
+          .replace(/\*\*/g, '<br>')
+          .replace(/###/g, '<br>')
+          .replace(/####/g, '<br>');
+        formattedResponse = formattedResponse.replace(/(Date:\s[\w\s,]+)/g, '<b>$1</b><br>');
+        formattedResponse = formattedResponse
+        .replace(/\b(Morning|Afternoon|Evening)\b/g, '<br><b>$1</b>')
+        .replace(/Time:/g, '<br>Time:')
+        .replace(/Activity:/g, '<br>Activity:');
+        formattedResponse = formattedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
+        res.json({ message: formattedResponse });
       } catch (error) {
         console.error("Error communicating with the Gaia API:", error.response?.data || error.message);
         res.status(500).json({ error: "Error communicating with the Gaia API" });
@@ -125,11 +128,6 @@ Give recommendations for "${userResponses.accomodationAnswer}" type of accommoda
   }
 });
 
-app.get('/', (req, res) => {
-  res.send("Server is running");
-});
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
 });
