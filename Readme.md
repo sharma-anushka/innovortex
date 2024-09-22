@@ -1,13 +1,12 @@
 # TravelTweak - AI-Powered Trip Planning Chatbot
 
-**TravelTweak** is an intelligent, AI-driven chatbot designed to make trip planning easy and personalized. It asks a series of questions and provides a detailed day-to-day itinerary based on user responses. The chatbot integrates with **Gaianet.ai's LLM** to generate detailed and dynamic trip plans, ensuring that every aspect of your journey is tailored to your preferences.
+**TravelTweak** is an intelligent, AI-driven chatbot designed to make trip planning easy and personalized. It asks a series of questions and provides a detailed day-to-day itinerary based on user responses. The chatbot integrates with **Gaianet.ai's Phi3 llm** to generate detailed and dynamic trip plans, tayloring every aspect of the journey to your preferences.
 
 ## Key Features
 
-- **AI-Powered Trip Planning**: TravelTweak uses **Gaianet.ai's LLM** to generate highly customized trip plans based on user preferences.
+- **AI-Powered Trip Planning**: TravelTweak uses **Gaianet.ai's LLM** to generate trip plans based on user preferences.
 - **Interactive Chatbot**: The chatbot interacts with users by asking questions about their destination, type of vacation, budget, travel mode, and more.
 - **Detailed Itineraries**: After gathering information, TravelTweak provides a full day-to-day itinerary, including hotel recommendations, activities, and dining suggestions.
-- **Seamless Experience**: The chatbot leverages the power of **Gaianet.ai's LLM**, ensuring that trip suggestions are always fresh, accurate, and personalized.
 
 This project is deployed on https://aanvig2.github.io/Travel-Chatbot/
 
