@@ -10,48 +10,65 @@
 
     body {
         font-family: 'Inter', sans-serif;
-        background-color: #000000;
+        background-image: url("bg.jpg"); 
+        box-shadow: 0 3000px rgba(0, 0, 0, 0.3) inset;
+        background-repeat: no-repeat;
+        background-size:cover;
         margin: 0;
         padding: 0;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        animation: fadeIn 1s ease-in-out;
     }
 
     .chat-container {
         width: 90vw;
         height: 90vh;
-        background-color: #0a0a0a;
+        background-color: rgba(0,0,0, 0.2);
         border-radius: 15px;
         display: flex;
         flex-direction: column;
-        box-shadow: 0px 5px 25px rgba(0, 255, 255, 0.6);
         max-width: 700px;
         max-height: 90vh;
         overflow: hidden;
         margin: 20px;
-        animation: scaleIn 0.6s ease-out;
+        animation: fadeIn 1s ease-in-out;
     }
 
     .chat-header {
-        background-color: #0d0d0d;
-        color: #00ccff;
+        display: flex;
+        align-items: center; 
+        color: #ffffff;
         padding: 20px;
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
         border-radius: 15px 15px 0 0;
-        box-shadow: 0 0 20px rgba(0, 204, 255, 0.8);
-        animation: glow 1.5s infinite alternate;
+        animation: slideIn 0.5s ease-in-out;
+    }
+    
+    .user_img{
+        height: 70px;
+        width: 70px;
+        margin-right: 10px;
+        border:1.5px solid #f5f6fa;
+        border-radius: 100%;
+        animation: scaleUp 0.5s ease;
+    }
+
+    .info span{
+        font-size: 20px;
+        font-weight: bold; 
+    }
+    
+    .info p{
+        font-size: 12px;
+        font-weight: medium; 
+        color: rgba(255,255,255,0.6);
     }
 
     .chat-body {
         padding: 20px;
         flex-grow: 1;
         overflow-y: auto;
-        background-color: #0d0d0d;
         color: #ffffff;
         display: flex;
         flex-direction: column;
@@ -64,29 +81,27 @@
         padding: 10px 15px;
         border-radius: 20px;
         max-width: 90%;
-        animation: fadeIn 0.8s ease-in-out;
+        opacity: 0;
+        animation: fadeInMessage 0.8s ease forwards;
     }
 
     .user {
-        background-color: #00ccff;
+        background-color: #439b36;
         color: #ffffff;
         align-self: flex-end;
-        box-shadow: 0px 0px 15px rgba(0, 204, 255, 0.7);
     }
 
     .bot {
-        background-color: #333333;
-        color: #ffffff;
+        background-color: rgb(90, 145, 197);
+        color: #000000;
         align-self: flex-start;
-        box-shadow: 0px 0px 10px rgba(75, 79, 86, 0.7);
     }
 
     .chat-footer {
         display: flex;
         padding: 15px;
         border-top: 1px solid #ddd;
-        background-color: #0d0d0d;
-        box-shadow: 0 -2px 10px rgba(0, 204, 255, 0.6);
+        box-shadow: 0 -2px 10px rgba(166, 222, 235, 0.6);
     }
 
     .input-message {
@@ -95,56 +110,49 @@
         border: none;
         border-radius: 10px;
         font-size: 16px;
-        background-color: #333333;
-        color: #ffffff;
-        animation: fadeIn 0.6s ease-in-out;
+        background-color: #c7c1c1;
+        color: #000000;
+        animation: fadeIn 0.6s ease;
     }
 
     .send-btn {
-        background-color: #00ccff;
-        color: white;
+        background-color: #c7c1c1;
+        color: #000000;
         border: none;
         padding: 10px 16px;
         margin-left: 10px;
         border-radius: 8px;
         cursor: pointer;
-        font-weight: bold;
-        box-shadow: 0px 0px 15px rgba(0, 204, 255, 0.8);
+        font-size: 15px;
+        font-weight: 150px;
         transition: background-color 0.3s ease, transform 0.2s ease;
+        animation: scaleUp 0.5s ease;
     }
 
     .send-btn:hover {
-        background-color: #0088cc;
+        background-color: #ffffff;
         transform: scale(1.05);
     }
 
+    /* Animation Keyframes */
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 
-    @keyframes scaleIn {
-        from {
-            transform: scale(0.9);
-            opacity: 0.5;
-        }
-        to {
-            transform: scale(1);
-            opacity: 1;
-        }
+    @keyframes slideIn {
+        from { transform: translateY(-100%); }
+        to { transform: translateY(0); }
     }
 
-    @keyframes glow {
-        from {
-            box-shadow: 0 0 20px rgba(0, 204, 255, 0.8);
-        }
-        to {
-            box-shadow: 0 0 40px rgba(0, 204, 255, 1);
-        }
+    @keyframes scaleUp {
+        from { transform: scale(0.8); }
+        to { transform: scale(1); }
+    }
+
+    @keyframes fadeInMessage {
+        0% { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
     }
 
     /* Responsive design */
@@ -171,55 +179,73 @@
         }
     }
 </style>
+
 </head>
 <body>
 
 <div class="chat-container">
   <div class="chat-header">
-    Plan your Trip!
+    <img src="https://i.ibb.co/fSNP7Rz/icons8-chatgpt-512.png" class="user_img">
+    <div class="info">
+      <span>TravelTweak</span>
+      <p>Tailoring your trips just the way you like!</p>
+    </div>
   </div>
+
   <div class="chat-body" id="chatBody"></div>
+
   <div class="chat-footer">
-    <input type="text" id="messageInput" class="input-message" placeholder="Type your message">
+    <input type="text" id="messageInput" class="input-message" placeholder="Type your message here...">
     <button class="send-btn" onclick="sendMessage()">Send</button>
   </div>
 </div>
 
 <script>
     const chatBody = document.getElementById('chatBody');
-    const messageInput = document.getElementById('messageInput'); 
+    const messageInput = document.getElementById('messageInput');
+  
     async function sendMessage() {
-    const userMessage = messageInput.value.trim();
+      const userMessage = messageInput.value.trim();
+  
       if (userMessage === '') return;
+  
       appendMessage(userMessage, 'user');
+  
       const response = await fetch('http://localhost:3000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage })
       });
+  
       const data = await response.json();
+  
       appendMessage(data.message, 'bot');
+  
       messageInput.value = '';
       chatBody.scrollTop = chatBody.scrollHeight;
     }
+  
     function appendMessage(message, sender) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', sender);
       messageElement.textContent = message;
       chatBody.appendChild(messageElement);
-      chatBody.scrollTop = chatBody.scrollHeight;
+      chatBody.scrollTop = chatBody.scrollHeight; // Scroll to the bottom after each message
     }
   
+    // Fetch the first question from the server
     async function fetchFirstQuestion() {
       try {
         const response = await fetch('http://localhost:3000/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: '' }) 
+          body: JSON.stringify({ message: '' }) // Initial empty message to start the conversation
         });
+  
         const data = await response.json();
+  
         if (data && data.message) {
-          appendMessage(data.message, 'bot');
+          appendMessage(data.message, 'bot'); // Display the first question from the bot
         } else {
           console.error('Error fetching the first question:', data);
         }
@@ -228,14 +254,16 @@
       }
     }
   
-    fetchFirstQuestion();
+    // Start the conversation by fetching the first question
+    fetchFirstQuestion(); // Trigger fetching the first question on page load
   
+    // Enable sending messages with the Enter key
     messageInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         sendMessage();
       }
     });
-    </script>
+  </script>
 
 </body>
 </html>
