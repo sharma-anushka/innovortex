@@ -228,10 +228,17 @@
     function appendMessage(message, sender) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', sender);
-      messageElement.textContent = message;
+      
+      // Use innerHTML to render HTML tags (like <br> and <b>) as part of the message content
+      messageElement.innerHTML = message;
+      
+      // Append the message to the chat body
       chatBody.appendChild(messageElement);
-      chatBody.scrollTop = chatBody.scrollHeight; // Scroll to the bottom after each message
+      
+      // Scroll to the bottom of the chat
+      chatBody.scrollTop = chatBody.scrollHeight;
     }
+    
   
     // Fetch the first question from the server
     async function fetchFirstQuestion() {
@@ -267,4 +274,3 @@
 
 </body>
 </html>
-
