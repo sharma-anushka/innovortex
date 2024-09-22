@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const API_URL = "https://phi.us.gaianet.network/v1/chat/completions";
+const LLAMA_API_URL = "https://phi.us.gaianet.network/v1/chat/completions";
 
 // Questions to ask the user
 const tripQuestions = [
@@ -25,6 +25,7 @@ const tripQuestions = [
   "Any dietary preferences or restrictions?"
 ];
 
+// Response keys to store answers meaningfully
 const responseKeys = [
   'destinationAnswer',
   'vacationTypeAnswer',
@@ -46,20 +47,26 @@ let currentQuestionIndex = 0;
 app.post('/chat', async (req, res) => {
   const userMessage = req.body.message;
 
+  // First question: If no message and at the beginning of the conversation
   if (!userMessage && currentQuestionIndex === 0) {
     return res.json({ message: tripQuestions[currentQuestionIndex] });
   }
 
+  // Handle case where the user does not provide a message
   if (!userMessage) {
     return res.status(400).json({ error: "Message is required" });
   }
 
+  // If questions remain, store the response and move to the next question
   if (currentQuestionIndex < tripQuestions.length) {
     userResponses[responseKeys[currentQuestionIndex]] = userMessage;
     currentQuestionIndex++;
+
+    // Send the next question
     if (currentQuestionIndex < tripQuestions.length) {
       return res.json({ message: tripQuestions[currentQuestionIndex] });
     } else {
+      // All questions answered, compile the information for LLM
       const compiledInfo = `
 You are a trip planning expert which prepares a day-to-day itinerary of the trip for the user. Your answering format should follow this template:
 Date: "Provide the date"
@@ -75,9 +82,11 @@ A person wants to go to "${userResponses.destinationAnswer}" and have a "${userR
 
 Give recommendations for "${userResponses.accomodationAnswer}" type of accommodation at the destination. Include "${userResponses.interestAnswer}" in the day-to-day trip plan. The places to eat should follow their preferences: "${userResponses.dietAnswer}".
       `;
+
+      // Send the compiled info to the external LLM API
       try {
         const response = await axios.post(
-          API_URL,
+          LLAMA_API_URL,
           {
             messages: [
               { role: "system", content: "You are a helpful assistant." },
@@ -92,8 +101,10 @@ Give recommendations for "${userResponses.accomodationAnswer}" type of accommoda
           }
         );
 
+        // Ensure proper formatting of the final response
         let aiResponse = response.data.choices[0].message.content.trim();
 
+        // Format the response with new lines after key sections
         aiResponse = aiResponse
           .replace(/Date/g, "\nDate")
           .replace(/Hotel Recommendation/g, "\nHotel Recommendation")
@@ -106,6 +117,8 @@ Give recommendations for "${userResponses.accomodationAnswer}" type of accommoda
         console.error("Error communicating with the Gaia API:", error.response?.data || error.message);
         res.status(500).json({ error: "Error communicating with the Gaia API" });
       }
+
+      // Reset for next session
       currentQuestionIndex = 0;
       userResponses = {};
     }
